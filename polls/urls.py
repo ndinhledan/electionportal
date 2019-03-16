@@ -3,7 +3,7 @@ from django.urls import path, include
 from . import views
 
 urlpatterns =[
-	path('', views.VoteView.as_view(), name='vote'),
+	path('', views.vote_or_not, name='vote'),
 	path('signup/', views.signup, name='signup'),
 	path('accounts/', include('django.contrib.auth.urls'), name='accounts'),
 	path('logout/', views.logoutin, name='logoutin'),

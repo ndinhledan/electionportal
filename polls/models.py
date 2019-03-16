@@ -64,7 +64,7 @@ class Vote(models.Model):
 		return self.voter.username + '__' + self.vote.choice.__str__()
 
 	class Meta:
-		ordering = ['voter']
+		ordering = ['voter', 'vote']
 		unique_together = (("vote", "voter"),)
 
 
