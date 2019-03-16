@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.contrib.auth import login, authenticate
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -111,10 +112,11 @@ def activate(request, uidb64, token):
 def logoutin(request):
 	return logout_then_login(request)
 
+@login_required
 def vote_or_not(request):
 	match = Vote.objects.filter(voter=request.user)
 	if match:
-		return HttpResponse("lolol")
+		return HttpResponse("You already voted")
 	else:
 		return VoteView.as_view()(request)
 	
