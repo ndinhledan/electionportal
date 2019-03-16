@@ -1,0 +1,38 @@
+{% if error_message %}
+	<strong> {{ error_message }} </strong>
+{% endif %}
+
+{% if positions_list %}
+<form method="post">
+	{{ form.as_p }}
+	{% csrf_token %}
+	<ul>
+		{% for position in positions_list %}
+			<li>{{ position.get_position_display }}</li>
+			{% if previous_votes %}
+				{% for choice in position.choice_set.all %}
+					{% if choice in previous_votes %}
+						<input type="radio" name="choice{{position.position}}" id = "choice{{forloop.counter}}" value = " {{choice.id}} " checked>
+					{% else %}
+						<input type="radio" name="choice{{position.position}}" id = "choice{{forloop.counter}}" value = " {{choice.id}} ">
+					{% endif %}
+					<label for="choice{{forloop.counter}}">{{ choice.applicant.name }}</label><br>
+				{% endfor %}
+			{% else %}
+				{% for choice in position.choice_set.all %}
+						<input type="radio" name="choice{{position.position}}" id = "choice{{forloop.counter}}" value = " {{choice.id}} ">
+						<label for="choice{{forloop.counter}}">{{ choice.applicant.name }}</label><br>
+				{% endfor %}
+			{% endif %}
+		<input type="radio" name="choice{{position.position}}" id = "choice{{forloop.counter}}none" value = "0">
+		<label for="choice{{forloop.counter}}none">None</label><br>
+		{% endfor %}
+	</ul>
+	<button type="submit">Vote!</button>
+</form>
+{% else %}
+No vote
+
+{% endif %}
+
+<a href="{% url 'logoutin' %}">Logout</a>
