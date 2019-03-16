@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.contrib.auth import login, authenticate
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -48,7 +49,6 @@ class VoteView(LoginRequiredMixin, generic.ListView):
 
 		try:
 			for choice in choices:
-				print(request.POST[choice])
 				if request.POST[choice] != "0":
 					pos_choice = Choice.objects.get(pk=request.POST[choice])
 					pos_choice.number_of_votes += 1
@@ -71,11 +71,8 @@ def signup(request):
 	if request.method == 'POST':
 		form = SignupForm(request.POST)
 		if form.is_valid():
-			print('here1') 
 			user = form.save(commit=False)
-			print('here2')
 			user.is_active = False
-			print('here3')
 			user.save()
 			current_site = get_current_site(request)
 			mail_subject = 'Activate your account.'
@@ -93,7 +90,6 @@ def signup(request):
 			return HttpResponse('Please confirm your email address in your mailbox to complete the registration')
 	else:
 		form = SignupForm()
-	print('here')
 	return render(request, 'polls/signup.html', {'form': form})
 
 
@@ -115,3 +111,12 @@ def activate(request, uidb64, token):
 
 def logoutin(request):
 	return logout_then_login(request)
+
+@login_required
+def vote_or_not(request):
+	match = Vote.objects.filter(voter=request.user)
+	if match:
+		return HttpResponse("You already voted")
+	else:
+		return VoteView.as_view()(request)
+	
