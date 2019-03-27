@@ -35,6 +35,8 @@ class Applicant(models.Model):
 
 	choices = models.ManyToManyField(Positions, through='Choice')
 
+	image = models.ImageField(upload_to='applicant photos', blank=True)
+
 	def __str__(self):
 		return self.name
 

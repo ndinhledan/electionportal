@@ -2,14 +2,59 @@
 <html>
 <head>
 	<title>Vote</title>
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+	<style>
+		body{
+			background: url(https://images.unsplash.com/photo-1464639351491-a172c2aa2911?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80);
+			background:cover no-repeat;
+		}
+		#logo{
+			margin-left: auto;
+			margin-right: auto;
+			text-align: center;
+			padding-top: 30px;
+		}
+		.jumbotron{
+			background: rgb(255, 255, 255);
+			margin-top: 50px;
+			width: 600px;
+			height: auto;
+			margin-left:auto;
+			margin-right: auto;
+			border-radius: 12px;
+			padding-top: 10px;
+		}
+		.btn{
+			margin-bottom: 10px;
+			margin-left: 220px;
+			width: 100px;
+		}
+		.form{
+			padding-left:50px; 
+			margin-top: 20px;
+		}
+		li{
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+			font-size: 16px;
+		}
+		label{
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+			font-size: 14px;
+			font-weight: 300;
+		}
+	</style>
 </head>
 <body>
+	<div id="logo">
+		<img style="width:300px; height:50px" src="http://vnntu.com/wordpress/wp-content/uploads/2015/01/Logo-type.png" alt="">
+	</div>
 	{% if error_message %}
 	<strong> {{ error_message }} </strong>
 	{% endif %}
 
 	{% if positions_list %}
-	<form method="post">
+	<div class="jumbotron">
+	<form class="form" method="post">
 		{% csrf_token %}
 		<ul>
 			{% for position in positions_list %}
@@ -26,21 +71,23 @@
 				{% else %}
 					{% for choice in position.choice_set.all %}
 							<input type="radio" name="choice{{position.position}}" id = "choice{{forloop.counter}}" value = " {{choice.id}} ">
-							<label for="choice{{forloop.counter}}">{{ choice.applicant.name }}</label><br>
+							<label for="choice{{forloop.counter}}">{{ choice.applicant.name }}: {{choice.applicant.major}}/{{choice.applicant.year}}</label>
+							<img src="{{ choice.applicant.image.url }}" width="240"><br>
 					{% endfor %}
 				{% endif %}
 				<input type="radio" name="choice{{position.position}}" id = "choice{{forloop.counter}}none" value = "0">
-				<label for="choice{{forloop.counter}}none">None</label><br>
+				<label for="choice{{forloop.counter}}none">None</label><br><br>
 			{% endfor %}
 			</ul>
-		<button type="submit">Vote!</button>
+		<button class="btn btn-primary center-block" type="submit">Vote!</button>
+		<a class="btn btn-default" href="{% url 'logoutin' %}" >Logout</a>
 	</form>
+	</div>
 	{% else %}
 	No vote
 
 	{% endif %}
 
-	<a href="{% url 'logoutin' %}" >Logout</a>
 </body>
 </html>
 
