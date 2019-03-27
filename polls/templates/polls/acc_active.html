@@ -18,10 +18,8 @@
 			font-weight: 400;
             color: aliceblue;
 		}
-		#button_logout{
-			 position: absolute;
-    		top: 10px;
-    		right: 10px;
+		.button_vote{
+			text-align:center;
 		}
         </style>
 </head>
@@ -29,10 +27,7 @@
 	<div id="logo">
 	<img style="width:300px; height:50px" src="http://vnntu.com/wordpress/wp-content/uploads/2015/01/Logo-type.png" alt="">
 	</div>
-	{% if voted %}
-    <h1 id="main_head">You already voted!</h1>
-	{% else %}
-	<h1 id="main_head">Thank you for your vote!</h1>
-	{% endif %}
-	<a id="button_logout" class="btn btn-default" href="{% url 'logoutin' %}" >Logout</a>
+    <h1 id="main_head">Please confirm your email address in your mailbox to complete the registration</h1>
+
+	
 </body>

@@ -71,14 +71,16 @@
 				{% else %}
 					{% for choice in position.choice_set.all %}
 							<input type="radio" name="choice{{position.position}}" id = "choice{{forloop.counter}}" value = " {{choice.id}} ">
-							<label for="choice{{forloop.counter}}">{{ choice.applicant.name }}</label><br>
+							<label for="choice{{forloop.counter}}">{{ choice.applicant.name }}: {{choice.applicant.major}}/{{choice.applicant.year}}</label>
+							<img src="{{ choice.applicant.image.url }}" width="240"><br>
 					{% endfor %}
 				{% endif %}
 				<input type="radio" name="choice{{position.position}}" id = "choice{{forloop.counter}}none" value = "0">
-				<label for="choice{{forloop.counter}}none">None</label><br>
+				<label for="choice{{forloop.counter}}none">None</label><br><br>
 			{% endfor %}
 			</ul>
 		<button class="btn btn-primary center-block" type="submit">Vote!</button>
+		<a class="btn btn-default" href="{% url 'logoutin' %}" >Logout</a>
 	</form>
 	</div>
 	{% else %}
@@ -86,7 +88,6 @@
 
 	{% endif %}
 
-	<a href="{% url 'logoutin' %}" >Logout</a>
 </body>
 </html>
 

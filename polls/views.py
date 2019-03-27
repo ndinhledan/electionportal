@@ -64,7 +64,7 @@ class VoteView(LoginRequiredMixin, generic.ListView):
 			return render(request, self.template_name, {'positions_list': self.get_query_set(),
 														'error_message': "Please select a choice for all position"})
 		
-		return HttpResponse('Thank you for voting!')
+		return render(request, 'polls/voted.html', {'voted': False})
 
 
 def signup(request):
@@ -87,7 +87,7 @@ def signup(request):
 						mail_subject, message, to=[to_email]
 			)
 			email.send()
-			return HttpResponse('Please confirm your email address in your mailbox to complete the registration')
+			return render(request, 'polls/acc_active.html')
 	else:
 		form = SignupForm()
 	return render(request, 'polls/signup.html', {'form': form})
@@ -105,7 +105,7 @@ def activate(request, uidb64, token):
 		user.save()
 		login(request, user)
 		# return redirect('home')
-		return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+		return render(request, 'polls/acc_success.html')
 	else:
 		return HttpResponse('Activation link is invalid!')
 
@@ -116,7 +116,7 @@ def logoutin(request):
 def vote_or_not(request):
 	match = Vote.objects.filter(voter=request.user)
 	if match:
-		return HttpResponse("You already voted")
+		return render(request, 'polls/voted.html', {'voted': True})
 	else:
 		return VoteView.as_view()(request)
 	

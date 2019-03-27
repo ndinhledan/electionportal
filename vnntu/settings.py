@@ -26,7 +26,8 @@ SECRET_KEY = '%0rkt+1e!hy9@@ea&+i8=j=z2@3)6bqfi$#69b-gc+351ue#_q'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '0.0.0.0',    
+    '0.0.0.0',
+    '127.0.0.1',    
 ]
 
 
@@ -125,6 +126,12 @@ STATIC_URL = '/static/'
 LOGIN_URL = 'login'
 
 LOGIN_REDIRECT_URL ='vote'
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'vnntu/media')
+
+
 
 #emaill confirmation
 
