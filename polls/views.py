@@ -1,0 +1,135 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views import generic
+
+from django.db import IntegrityError
+
+from django.http import HttpResponse
+
+from django.contrib.auth import login, authenticate
+from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+
+from django.template.loader import render_to_string
+
+from django.contrib.auth.models import User
+from django.contrib.auth.views import logout_then_login
+from django.core.mail import EmailMessage
+
+
+from .models import Positions, Vote, Choice
+from .tokens import account_activation_token
+from .forms import SignupForm
+
+# Create your views here.
+
+class VoteView(LoginRequiredMixin, generic.ListView):
+	model = Positions
+
+	context_object_name = 'positions_list'
+
+	template_name = 'polls/vote.html'
+
+	def get_query_set(self):
+		return Positions.objects.all()
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['previous_votes'] = [prev_vote.vote for prev_vote in Vote.objects.filter(voter=self.request.user)]
+
+		return context
+
+	def post(self, request):
+		choices = ['choicePR', 'choiceVP', 'choiceHG']
+		votes = []
+		pos_choices = []
+
+		prev_votes = Vote.objects.filter(voter=request.user)
+
+		try:
+			for choice in choices:
+				splits = request.POST[choice].split(' ')
+				pos_choice = Choice.objects.get(pk=splits[0])
+				if len(splits) == 1:
+					pos_choice.number_of_votes += 1
+				else:
+					pos_choice.number_of_votes_against +=1
+				pos_choices.append(pos_choice)
+				print(pos_choices)
+				vote = Vote(vote=pos_choice, voter=request.user)
+				votes.append(vote)
+				print(votes)
+
+		except IntegrityError:
+			return HttpResponse("yey")
+
+		except (KeyError, Choice.DoesNotExist):
+			return render(request, self.template_name, {'positions_list': self.get_query_set(),
+														'error_message': "Please select a choice for all position"})
+
+		print(choices)
+		print(votes)
+		for choice in pos_choices:
+			choice.save()
+		for vote in votes:
+			vote.save()
+
+		return render(request, 'polls/voted.html', {'voted': False})
+
+
+def signup(request):
+	if request.method == 'POST':
+		form = SignupForm(request.POST)
+		if form.is_valid():
+			user = form.save(commit=False)
+			user.is_active = False
+			user.save()
+			current_site = get_current_site(request)
+			mail_subject = 'Activate your account.'
+			message = render_to_string('polls/acc_active_email.html', {
+				'user': user,
+				'domain': current_site.domain,
+				'uid':urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+				'token':account_activation_token.make_token(user),
+			})
+			to_email = form.cleaned_data.get('email')
+			email = EmailMessage(
+						mail_subject, message, to=[to_email]
+			)
+			email.send()
+			return render(request, 'polls/acc_active.html')
+	else:
+		form = SignupForm()
+	return render(request, 'polls/signup.html', {'form': form})
+
+
+
+def activate(request, uidb64, token):
+	try:
+		uid = force_text(urlsafe_base64_decode(uidb64))
+		user = User.objects.get(pk=uid)
+	except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+		user = None
+	if user is not None and account_activation_token.check_token(user, token):
+		user.is_active = True
+		user.save()
+		login(request, user)
+		# return redirect('home')
+		return render(request, 'polls/acc_success.html')
+	else:
+		return HttpResponse('Activation link is invalid!')
+
+def logoutin(request):
+	return logout_then_login(request)
+
+@login_required
+def vote_or_not(request):
+	match = Vote.objects.filter(voter=request.user)
+	if match:
+		return render(request, 'polls/voted.html', {'voted': True})
+	else:
+		return VoteView.as_view()(request)
+	

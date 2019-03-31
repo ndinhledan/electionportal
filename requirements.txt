@@ -1,0 +1,6 @@
+configparser==3.7.4
+Django==2.1.7
+ez-setup==0.9
+Pillow==5.4.1
+PyMySQL==0.9.3
+pytz==2018.9

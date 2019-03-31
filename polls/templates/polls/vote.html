@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Vote</title>
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+	<style>
+		body{
+			background: url(https://images.unsplash.com/photo-1464639351491-a172c2aa2911?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80);
+			background:cover no-repeat;
+		}
+		#logo{
+			margin-left: auto;
+			margin-right: auto;
+			text-align: center;
+			padding-top: 30px;
+		}
+		.jumbotron{
+			background: rgb(255, 255, 255);
+			margin-top: 50px;
+			width: 700px;
+			height: auto;
+			margin-left:auto;
+			margin-right: auto;
+			border-radius: 12px;
+			padding-top: 10px;
+		}
+		.btn{
+			margin-bottom: 10px;
+			margin-left: 220px;
+			width: 100px;
+		}
+		.form{
+			padding-left:50px; 
+			margin-top: 20px;
+		}
+		li{
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+			font-size: 18px;
+			font-weight: 650;
+			margin-top:10px;
+		}
+		label{
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+			font-size: 16px;
+			font-weight: 400;
+			color: #666;
+     		cursor: pointer;
+		}
+		.img_app{
+			margin-left: 10px;
+			margin-top: 30px;
+		}
+		.form-radio
+			{
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				appearance: none;
+				display: inline-block;
+				position: relative;
+				background-color: #f1f1f1;
+				color: rgb(75, 75, 75);
+				top: 10px;
+				height: 28px;
+				width: 28px;
+				border: 0;
+				border-radius: 50px;
+				cursor: pointer;     
+				margin-right: 7px;
+				outline: none;
+			}
+			.form-radio:checked::before
+			{
+				position: absolute;
+				font: 13px/1 'Open Sans', sans-serif;
+				left: 11px;
+				top: 7px;
+				content: '\02143';
+				transform: rotate(40deg);
+			}
+			.form-radio:hover
+			{
+				background-color: #f7f7f7;
+			}
+			.form-radio:checked
+			{
+				background-color: #f1f1f1;
+			}
+
+	</style>
+</head>
+<body>
+	<div id="logo">
+		<img style="width:300px; height:50px" src="http://vnntu.com/wordpress/wp-content/uploads/2015/01/Logo-type.png" alt="">
+	</div>
+	{% if positions_list %}
+	<div class="jumbotron">
+	<form class="form form-group" method="post">
+		{% csrf_token %}
+			{% if error_message %}
+			<strong> {{ error_message }} </strong>
+			{% endif %}
+		<ul style="list-style: none;">
+			{% for position in positions_list %}
+				{% for choice in position.choice_set.all %}
+				<li>{{ position.get_position_display }}: {{ choice.applicant.name }}: {{choice.applicant.major}}/{{choice.applicant.year}} <img class="img_app"src="{{ choice.applicant.image.url }}" width="200"><br></li>
+				<table>
+					<tr>
+						<td><input class="form-radio" type="radio" name="choice{{position.position}}" id = "choice{{forloop.counter}}" value = "{{choice.id}}">
+							<label for="choice{{forloop.counter}}">Yay</label>
+						</td>
+					</tr>
+					<tr>
+						<td>	
+							<input class="form-radio" type="radio" name="choice{{position.position}}" id = "choice{{forloop.counter}}none" value = "{{choice.id}} !">
+							<label for="choice{{forloop.counter}}none">Nay</label><br><br>
+						</td>
+					</tr>
+				</table>
+				{% endfor %}
+			{% endfor %}
+			</ul>
+		<button class="btn btn-primary center-block" type="submit">Vote!</button>
+		<a class="btn btn-default" href="{% url 'logoutin' %}" >Logout</a>
+	</form>
+	</div>
+	{% else %}
+	No vote
+
+	{% endif %}
+
+</body>
+</html>
+
+
+
